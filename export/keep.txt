@@ -1,0 +1,14 @@
+# What moves from the source stack. Everything else stays behind. That is the point.
+# One per line: <kind>|<folder key>|<name>
+#   dashboard      <folder key>|<dashboard title>          into that team or folders key
+#   folder         <parent key>|<source folder title>      the folder, its subfolders and their dashboards
+#   alerts         <folder key>|<source folder title>[/<rule group>]
+#   contact_point  -|<contact point name>
+#   datasource     -|<source data source UID>
+# Folder keys are team keys or folders keys from platform/terraform.tfvars.
+#
+# dashboard|platform|Service overview
+# folder|payments|Payments
+# alerts|payments|Payments/checkout-latency
+# contact_point|-|Platform on-call
+# datasource|-|my-postgres

@@ -1,0 +1,7 @@
+{
+  "old-trial-loki-uid": "acme-platform-loki",
+  "grafanacloud-prom": {
+    "payments": "acme-payments-prom",
+    "*": "acme-platform-prom"
+  }
+}

@@ -1,0 +1,32 @@
+# Allowlist: ignore everything, then unignore project files only.
+*
+!*/
+!.gitignore
+!*.md
+!*.tf
+!*.tftest.hcl
+!.terraform.lock.hcl
+!*.tfvars.example
+!*.example.json
+!export/*.py
+!export/keep.txt
+!export/ds-map.json
+!platform/dashboards/**/*.json
+!platform/exported-folders.auto.tfvars.json
+
+# Never commit these, even if a rule above matches.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+.env
+.env.*
+*.token
+*.pem
+*.key
+crash.log
+crash.*.log
+export/out/
+__pycache__/

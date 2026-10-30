@@ -1,0 +1,85 @@
+# Copy to platform/terraform.tfvars and edit. Tokens go in TF_VAR_ env vars, not here.
+stack_slug  = "acmeprod"
+name_prefix = "acme"
+
+# The label every series and log line carries. Access keys on it.
+label_key = "team"
+
+# One entry per team.
+#   idp_group_ids: Entra ID group object ids, Okta or Google group names (team sync).
+#   externally_managed = true: your IdP creates the team over SCIM; Terraform looks it up.
+#   selector: any label selector instead of team="<key>", e.g. by namespace or cluster.
+teams = {
+  platform = {
+    display_name  = "Platform"
+    idp_group_ids = ["grafana-platform"]
+  }
+  payments = {
+    display_name  = "Payments"
+    idp_group_ids = ["grafana-payments"]
+    selector      = "{namespace=~\"payments-.*\"}"
+  }
+  web = {
+    display_name  = "Web"
+    idp_group_ids = ["grafana-web"]
+  }
+  leadership = {
+    display_name  = "Leadership"
+    idp_group_ids = ["grafana-leadership"]
+    folder_access = "View"
+  }
+}
+
+# Folder tree below the team folders. Up to three levels.
+folders = {
+  payments-services = { title = "Services", parent = "payments" }
+  payments-slo      = { title = "SLOs", parent = "payments-services" }
+}
+
+# Example personas. Check action names against the RBAC docs before you add more.
+# explore (default true) adds Explore; Viewers lack it and team Query does not add it.
+personas = {
+  "dashboard-reader" = {
+    description     = "Reads dashboards in its folders. Cannot edit or explore."
+    folder_keys     = ["leadership"]
+    folder_actions  = ["folders:read", "dashboards:read"]
+    assign_to_teams = ["leadership"]
+    explore         = false
+  }
+  "alert-author" = {
+    description     = "Writes dashboards and alert rules in the Payments tree."
+    folder_keys     = ["payments"]
+    folder_actions  = ["folders:read", "dashboards:read", "dashboards:write", "dashboards:create", "alert.rules:read", "alert.rules:write", "alert.rules:create"]
+    datasource_uids = ["acme-payments-prom"]
+    assign_to_teams = ["payments"]
+  }
+  # Explore only. Team folders and team data sources already come with the team.
+  "engineer" = {
+    description     = "Explore on the team's own data sources."
+    assign_to_teams = ["platform", "web"]
+  }
+}
+
+per_team_datasources     = true
+enable_lbac              = true
+lock_default_datasources = true
+
+# SSO over OAuth2. Client secret: TF_VAR_sso_client_secret.
+# Okta:
+# sso = {
+#   provider_name         = "okta"
+#   client_id             = "<okta app client id>"
+#   auth_url              = "https://<your-org>.okta.com/oauth2/v1/authorize"
+#   token_url             = "https://<your-org>.okta.com/oauth2/v1/token"
+#   api_url               = "https://<your-org>.okta.com/oauth2/v1/userinfo"
+#   groups_attribute_path = "groups"
+#   role_attribute_path   = "contains(groups[*], 'grafana-platform') && 'Admin' || 'Viewer'"
+# }
+# Entra ID:
+# sso = {
+#   provider_name = "azuread"
+#   client_id     = "<app registration client id>"
+#   auth_url      = "https://login.microsoftonline.com/<tenant id>/oauth2/v2.0/authorize"
+#   token_url     = "https://login.microsoftonline.com/<tenant id>/oauth2/v2.0/token"
+#   scopes        = "openid email profile"
+# }

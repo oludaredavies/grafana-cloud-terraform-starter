@@ -1,0 +1,11 @@
+# Copy to stack/terraform.tfvars. Tokens go in TF_VAR_ env vars, not here.
+stack_slug = "acmeprod"
+
+# Grafana provisioned the paid stack for you: leave create_stack false.
+create_stack = false
+
+# Creating it yourselves instead:
+# create_stack      = true
+# stack_name        = "Acme production"
+# region_slug       = "prod-eu-west-2"
+# delete_protection = true
